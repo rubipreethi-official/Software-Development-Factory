@@ -37,6 +37,15 @@ class BaseAgent:
             base_url=settings.nvidia_base_url,
             api_key=get_api_key_for_tier(model_tier),
         )
+        
+        self._openai_client = AsyncOpenAI(
+            api_key=settings.openai_api_key,
+        )
+        
+        self._gemini_client = AsyncOpenAI(
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            api_key=settings.gemini_api_key,
+        )
 
     async def execute(
         self,
@@ -56,10 +65,26 @@ class BaseAgent:
         last_error = None
         for attempt in range(settings.agent_max_retries):
             try:
+                # Fallback Provider Routing
+                client = self._nvidia_client
+                target_model = self.model
+                provider_desc = "NVIDIA NIM"
+                
+                if attempt == 1:
+                    client = self._openai_client
+                    target_model = "gpt-4o"
+                    provider_desc = "OpenAI GPT-4o"
+                    logger.info(f"[{self.agent_id}] Falling back to {provider_desc}")
+                elif attempt >= 2:
+                    client = self._gemini_client
+                    target_model = "gemini-1.5-pro"
+                    provider_desc = "Google Gemini"
+                    logger.info(f"[{self.agent_id}] Falling back to {provider_desc}")
+
                 start = time.time()
                 response = await asyncio.wait_for(
-                    self._nvidia_client.chat.completions.create(
-                        model=self.model,
+                    client.chat.completions.create(
+                        model=target_model,
                         messages=[
                             {"role": "system", "content": self.system_prompt},
                             {"role": "user",   "content": user_message},
@@ -70,7 +95,7 @@ class BaseAgent:
                     timeout=float(settings.agent_timeout_seconds),
                 )
                 latency_ms = int((time.time() - start) * 1000)
-                self._log_call(response.usage, latency_ms, self.model)
+                self._log_call(response.usage, latency_ms, f"{target_model} ({provider_desc})")
                 return response.choices[0].message.content
 
             except asyncio.TimeoutError:
@@ -80,18 +105,13 @@ class BaseAgent:
 
             except Exception as e:
                 error_str = str(e)
-                if "429" in error_str:
-                    wait = (2 ** attempt) * 3   # 3s, 6s, 12s
-                    logger.warning(
-                        f"[{self.agent_id}] Rate limited, "
-                        f"waiting {wait}s (attempt {attempt + 1})"
-                    )
-                    await asyncio.sleep(wait)
-                    last_error = error_str
-                else:
-                    raise RuntimeError(
-                        f"[{self.agent_id}] Non-retryable error: {error_str}"
-                    ) from e
+                wait = (2 ** attempt) * 2   
+                logger.warning(
+                    f"[{self.agent_id}] Attempt {attempt + 1} failed: {error_str}. "
+                    f"Waiting {wait}s."
+                )
+                await asyncio.sleep(wait)
+                last_error = error_str
 
         raise RuntimeError(
             f"[{self.agent_id}] All fallbacks exhausted. Last: {last_error}"

@@ -23,6 +23,10 @@ class Settings:
     nvidia_api_key_minimax: str = os.getenv("NVIDIA_API_KEY_MINIMAX", "")
     nvidia_api_key_deepseek: str = os.getenv("NVIDIA_API_KEY_DEEPSEEK", "")
     
+    # Fallback Providers
+    openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    
     nvidia_base_url: str = os.getenv(
         "NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"
     )

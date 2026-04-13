@@ -9,8 +9,8 @@ This is not a giant Langchain wrapper where agents talk to each other and halluc
 
 2. The Agent Swarm (NVIDIA NIM APIs)
 Instead of forcing one massive model to do everything, we use specialized tiers accessed via NVIDIA NIM:
-- Spec & Code Generation: We use `qwen3.5-122b-a10b` for heavy-lifting structuring and architectural logic.
-- Test Automation: We handoff to `mistral-small` since its codestral lineage is perfect for rapid functional coverage.
+- Spec & Code Generation: We use `mistral-small-4-119b-2603` for heavy-lifting structuring and architectural logic.
+- Test Automation: We also use `mistral-small` since its codestral lineage is perfect for rapid functional coverage.
 - Orchestration/Parsing: `moonshotai/kimi-k2.5` handles workflow parsing. 
 - Validation Circuit Breakers: `deepseek-v3.2` acts as our linter/QA gate.
 
