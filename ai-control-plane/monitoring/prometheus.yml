@@ -1,0 +1,22 @@
+# ──────────────────────────────────────────────────────────
+# Prometheus Configuration
+# Task: DEP-03
+# ──────────────────────────────────────────────────────────
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  - job_name: 'ai-control-plane'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['control-plane:8000']
+        labels:
+          service: 'ai-control-plane'
+          environment: 'development'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

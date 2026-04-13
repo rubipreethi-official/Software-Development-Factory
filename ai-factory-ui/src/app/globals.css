@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Custom HUD Colors */
+  --color-hud-bg: #0B0D11;
+  --color-hud-card: rgba(255, 255, 255, 0.03);
+  --color-hud-accent: #60A5FA;
+  --color-hud-accent-muted: rgba(96, 165, 250, 0.2);
+}
+
+:root {
+  --background: #0B0D11;
+  --foreground: #FFFFFF;
+}
+
+/* Base resets & HUD styles */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+/* HUD Glassmorphism */
+@utility glass-panel {
+  background-color: var(--color-hud-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+@utility glass-panel-glow {
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.1);
+  border-color: var(--color-hud-accent-muted);
+}
+
+/* Technical Text Glow */
+@utility text-glow {
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
+}
+
+/* Animated Glow Background */
+@keyframes pulse-glow {
+  0% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+  100% { opacity: 0.3; transform: scale(1); }
+}
+
+@utility hud-bg-glow {
+  position: fixed;
+  width: 60vw;
+  height: 60vh;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.15) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: -1;
+  pointer-events: none;
+  animation: pulse-glow 10s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.3);
+}

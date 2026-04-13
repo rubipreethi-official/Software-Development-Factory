@@ -1,0 +1,16 @@
+# Docker build context ignores
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+data/
+tests/
+docs/
+*.md
+*.txt
+.env
+.env.example
+*.db
+*.sqlite
+*.log

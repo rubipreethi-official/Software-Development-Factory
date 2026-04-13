@@ -1,0 +1,60 @@
+# ============================================
+# Policy Configuration — AI Control Plane
+# ============================================
+# This file defines validation thresholds,
+# gate policies, and escalation criteria.
+# ============================================
+
+spec_validation:
+  min_completeness_score: 0.7
+  max_contradictions: 3
+  contradiction_sensitivity: 0.6
+  required_sections:
+    - overview
+    - requirements
+    - constraints
+  human_review_threshold: 0.5
+
+validation_gates:
+  contract_validation:
+    blocking: true
+    timeout: 300
+    retry_count: 2
+  trajectory_evaluation:
+    blocking: false       # Advisory during pilot phase
+    timeout: 600
+    retry_count: 1
+  spec_validation:
+    blocking: true
+    timeout: 120
+    retry_count: 1
+
+escalation:
+  ambiguity_threshold: 0.5
+  low_confidence_threshold: 0.6
+  high_risk_operations:
+    - database_migration
+    - external_api_integration
+    - security_critical_code
+  auto_escalate_on_contradiction: true
+
+agent_coordination:
+  execution_order:
+    - api_designer
+    - logic_implementer
+    - test_generator
+  max_retries: 3
+  timeout_per_agent: 600
+  handoff_validation: true
+
+orchestration:
+  max_concurrent_workflows: 5
+  reconciliation_interval_seconds: 60
+  checkpoint_interval_seconds: 30
+  max_workflow_duration_seconds: 3600
+
+observability:
+  trace_sampling_rate: 1.0      # 100% during pilot
+  log_retention_days: 30
+  replay_storage_path: ./data/replays
+  metrics_export_interval: 15

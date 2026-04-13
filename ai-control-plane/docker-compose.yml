@@ -1,0 +1,84 @@
+# ──────────────────────────────────────────────────────────
+# AI Control Plane — Docker Compose Stack
+# Task: DEP-02
+# ──────────────────────────────────────────────────────────
+
+services:
+  # ── AI Control Plane ─────────────────────────────────────
+  control-plane:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-control-plane
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=sqlite+aiosqlite:///./data/control_plane.db
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY:-mock}
+      - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-sonnet-4-20250514}
+      - LOG_LEVEL=INFO
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-CHANGE-ME-IN-PRODUCTION}
+      - METRICS_ENABLED=true
+    volumes:
+      - control-plane-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; r = httpx.get('http://127.0.0.1:8000/api/v1/health'); exit(0 if r.status_code == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  # ── Prometheus ───────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    depends_on:
+      control-plane:
+        condition: service_healthy
+    networks:
+      - monitoring
+
+  # ── Grafana ──────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+volumes:
+  control-plane-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  monitoring:
+    driver: bridge

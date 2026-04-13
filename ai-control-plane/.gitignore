@@ -1,0 +1,12 @@
+# AI Control Plane — Semi-Autonomous Software Development Factory
+*.pyc
+__pycache__/
+*.egg-info/
+dist/
+build/
+.env
+data/
+*.db
+.pytest_cache/
+htmlcov/
+.coverage
