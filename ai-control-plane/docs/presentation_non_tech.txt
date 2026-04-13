@@ -1,0 +1,15 @@
+Hi everyone, thanks for joining today. I'm really excited to show you what we've built: the Semi-Autonomous Software Development Factory.
+
+I want you to think about how software is built today. A Product Manager writes a document detailing what they want. They hand it to a lead engineer who designs how it should work. That engineer assigns it to a developer who writes the code. Finally, it goes to a QA tester who checks for bugs. Every single time work moves from one human to the next, time is lost, communication breaks down, and the original vision gets slightly altered. It takes weeks.
+
+What we've built here is an "AI Team" in a box. 
+
+Instead of waiting weeks for a feature to be translated from a document into ready-to-use code, our system acts as the entire software team working simultaneously. Watch what happens here on the dashboard:
+1. We give it a standard text document (a PRD) of what we want.
+2. The central "Control Plane" (think of this as an AI Project Manager) wakes up our "Architect AI" to convert that simple english into a hardcore technical blueprint.
+3. Immediately after, it wakes up the "Engineer AI" to literally write the application based strictly on that blueprint. 
+4. And finally, before handing it to us, it wakes up the "Quality Assurance AI" to write tests and ensure the code actually does what we asked for in step 1.
+
+We can see the entire assembly line running live through a beautiful dashboard. 
+
+The true magic behind this isn't just that AI is generating code—it's that we have built the assembly line around it. The AI isn't allowed to go rogue or hallucinate; it's forced to work step-by-step through our structured factory pipeline. This drastically cuts down the time to build new digital products and ensures every line of code traces perfectly back to the business requirement.

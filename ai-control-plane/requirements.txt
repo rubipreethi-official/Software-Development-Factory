@@ -8,9 +8,9 @@ pydantic-settings==2.7.1
 anthropic==0.43.0
 
 # Database
-sqlalchemy[asyncio]==2.0.36
-alembic==1.14.1
-aiosqlite==0.20.0
+motor==3.7.1
+pymongo==4.16.0
+openai==1.58.1
 
 # Validation
 openapi-spec-validator==0.7.1
